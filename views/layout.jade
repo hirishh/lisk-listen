@@ -1,0 +1,23 @@
+doctype html
+html
+  head
+    title LiskListen - Lisk Transaction Visualizer
+    meta(name='description', content='Realtime Lisk transaction visualizer. See and hear new transactions and blocks as they occur.')
+    meta(name='keywords', content='LiskListen, Listen To Lisk, Lisk, visualizer, blockchain')
+    meta(name='author', content='Matteo Ferrari (@hirish on lisk.chat)')
+      
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css',
+        integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u', crossorigin='anonymous')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js',
+        integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')
+        
+    link(rel='stylesheet', href='/stylesheets/engine.css')
+    link(rel='stylesheet', type='text/css', href='/stylesheets/jquery.nouislider.custom.css')
+    //if IE
+      link(rel='stylesheet', href='/stylesheets/ie.css')
+        
+    script(src='https://js.pusher.com/4.1/pusher.min.js')
+    script(src='/javascript/lisklisten.min.js', type='text/javascript')
+  body
+    block content

@@ -1,0 +1,42 @@
+{
+  "name": "lisk-listen-express",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.15.5",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.0",
+    "serve-favicon": "~2.4.5"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-concat": "~0.5.1",
+    "grunt-contrib-jshint": "~0.11.2",
+    "grunt-contrib-uglify": "~0.9.1",
+    "grunt-move": "^0.1.3",
+    "grunt-newer": "~1.1.0",
+    "grunt-todos": "~0.3.0",
+    "grunt-contrib-watch": "~0.6.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hirishh/lisk-listen.git"
+  },
+  "homepage": "https://github.com/hirishh/lisk-listen",
+  "bugs": {
+    "url": "https://github.com/hirishh/lisk-listen/issues"
+  },
+  "keywords": [
+    "lisk",
+    "network",
+    "API"
+  ],
+  "author": "Matteo Ferrari (@hirish on Lisk.Chat)",
+  "license": "MIT"
+}

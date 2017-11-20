@@ -1,0 +1,87 @@
+extends layout
+
+block content
+  #pageSplitter
+    #header.row.interface
+      #rateBoxUSDBTC.col-sm-2
+        span#rateUSDBTC.rate ---
+        span#units USD / BTC
+        br
+        span.rateSource BITSTAMP
+      #rateBoxBTCLSK.col-sm-2
+        span#rateBTCLSK.rate ---
+        span#units &micro;BTC / LSK
+        br
+        span.rateSource BITTREX
+      #rateBoxUSDLSK.col-sm-2
+        span#rateUSDLSK.rate ---
+        span#units USD / LSK
+      #headerInfo.col-sm-6
+        span#titleHeader Realtime Lisk Transaction Visualizer
+        br
+        strong Donations will be highlighted! 
+        span#donationAddress(qrtarget='8522289235233120527L') 8522289235233120527L
+        br
+        | By Matteo Ferrari (@hirish on 
+        a(href='https://lisk.chat/') Lisk.Chat 
+        | ) | 
+        a(href='https://github.com/hirishh/lisk-listen') Source Code 
+        | | 
+        a(href='http://www.bitlisten.com/') BitListen
+    #pageDiv.contentPanel
+      #bubbleDiv
+      #overlay
+        #connectionStatus.monospace
+          #connectionInnerDiv.interface
+            p
+              label
+                span#LiskNode Lisk Node: 
+                  span#LiskNodeStatus 
+                  br
+                span#BittrexNode Bittrex: 
+                  span#BittrexNodeStatus
+                  br
+                span#BitstampNode Bitstamp: 
+                  span#BitstampNodeStatus
+                  br
+        #volumeWrapper.interface
+          #volumeControl
+          #volumeSlider.noUiSlider
+        #soundControls.interface
+          #scalePitch.monospace
+            p
+              | Select Instrument:
+              select(onchange='Sound.change(parseInt($(this).val(), 10));')
+                option(value='0') Celesta
+                option(value='1') Planet
+                option(value='2') Wikki
+            br
+            p
+              label
+                input#scalePitchCheckBox(type='checkbox', checked='checked', onchange='globalScalePitch = this.checked')
+                | 										Scale pitch with transaction amount
+                br
+                | (bigger transaction = deeper sound)
+            p
+              label
+                input#enableUSDPrice(type='checkbox', onchange='enableUSDPrice = this.checked')
+                | 										Enable USD Price in Transactions
+      span#waitingForTransactions
+        | Waiting for new blocks...
+  #hideInterface(onclick='toggleInterface()') [ Hide Interface ]
+  #noJavascript
+    p
+      | Please enable Javascript, or try a different web browser.
+  #noInternetExplorer(onclick='')
+    p
+      | Sorry,
+      span(style='color: yellow;') no support for Internet Explorer.
+    p
+      | Try
+      a(href='https://www.google.com/chrome/', target='_blank') Chrome
+      | ,
+      a(href='http://www.getfirefox.com', target='_blank') Firefox
+      |  or Safari.
+    br
+    p.clickSuppress(style='font-size: 0.5em;')
+      span(style='cursor: pointer; text-decoration: underline;')  (Click Here to Suppress this warning.)

@@ -1,0 +1,293 @@
+* {
+	margin: 0;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+
+@font-face {
+    font-family: bitcoinsymbol;
+    src: url(../images/BTC.ttf);
+}
+
+body {
+  position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background-image: url('../images/liskwp2.jpg');
+	background-size: cover;
+}
+
+img {
+	border-style: none;
+}
+
+a {
+	color: white;
+  text-decoration: none;
+	font-weight: bold;
+}
+
+.bitcoinsymbol {
+    font-family: bitcoinsymbol;
+    margin: 0 1px;
+}
+
+.interface {
+	position: relative;
+	z-index: 1;
+}
+
+#overlay {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+
+#bubbleDiv {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}
+
+#pageSplitter {
+	position: relative;
+	height: 100%;
+	width: 100%;
+}
+
+.contentPanel {
+  height: 100%;
+	overflow: hidden;
+}
+
+.innerDiv {
+	text-align: center;
+	color: white;
+	width: inherit;
+	position: absolute;
+}
+
+.floatableDiv {
+	position: absolute;
+	left: 0;
+	top: 0;
+	will-change: transform;
+}
+
+.fauxLink {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+#connectionStatus {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	z-index: 1;
+}
+
+#connectionInnerDiv {
+	position: absolute;
+	color: white;
+	bottom: 0;
+	left: 0;
+	margin: 2em;
+	width: 33em;
+}
+
+#header {
+	width: 100%;
+	text-align: center;
+	padding: 35px;
+	color: white;
+}
+
+#titleHeader {
+	font-size: 38px;
+	line-height: 1;
+	font-weight: 700;
+}
+
+.rate {
+	font-size: 50px;
+  padding: 3px;
+}
+
+#units {
+	color: gray;
+}
+
+#headerInfo {
+	line-height: 1.6;
+	font-size: larger;
+}
+
+#volumeWrapper {
+	position: absolute;
+	bottom: 150px;
+	right: 0;
+	margin: 2em;
+}
+
+#volumeControl {
+	background: url('../images/sound.png') right;
+	background-position: 0 -46px;
+	cursor: pointer;
+	width: 50px;
+	height: 46px;
+	opacity: 0.5;
+}
+
+#volumeControl:hover {
+	opacity: 1;
+}
+
+#volumeSlider {
+	position: absolute;
+	height: 100px;
+	bottom: 66px;
+	display: block;
+	right: 20px;
+}
+
+#soundControls {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	margin: 2em;
+	color: white;
+}
+
+#soundControls p {
+    margin: 0.5em 0;
+}
+
+#hideInterface {
+	position: absolute;
+	right: 0;
+	top: 0;
+	margin: 10px;
+	z-index: 1;
+	cursor: pointer;
+	color: white;
+	transition: opacity 0.5s;
+	-moz-transition: opacity 0.5s; /* Firefox 4 */
+	-webkit-transition: opacity 0.5s; /* Safari and Chrome */
+	-o-transition: opacity 0.5s; /* Opera */
+}
+
+#noJavascript {
+	color: white;
+	position: absolute;
+	height: 5em;
+	width: 25em;
+	line-height: 5em;
+	text-align: center;
+	background-color: rgba(0, 0, 0, 0.5);
+	border: solid white 1px;
+	left: 50%;
+	top: 50%;
+	margin: -2.5em 0 0 -12.5em;
+	font-size: 2em;
+}
+
+#noInternetExplorer {
+	padding: 0.5em;
+	color: white;
+	position: absolute;
+	height: 5em;
+	width: 25em;
+	text-align: center;
+	background-color: rgba(0, 0, 0, 0.5);
+	border: solid white 1px;
+	left: 50%;
+	top: 50%;
+	margin: -2.75em 0 0 -13em;
+	font-size: 2em;
+	display: none;
+}
+
+#unauthorizedDomain{
+	padding: 0.5em;
+	color: white;
+	position: absolute;
+	height: 11em;
+	width: 45em;
+	text-align: center;
+	background-color: rgba(0, 0, 0, 0.5);
+	border: solid white 1px;
+	left: 50%;
+	top: 50%;
+	margin: -5.5em 0 0 -22.5em;
+	display: none;
+}
+
+#musicianDonation span{
+    color: green;
+    text-decoration: none
+}
+
+a.boxclose{
+    position: absolute;
+	top: 0;
+	right: 0;
+    cursor:pointer;
+    color: #fff;
+    border: 1px solid #AEAEAE;
+    background: #605F61;
+    font-size: 31px;
+    font-weight: bold;
+    display: inline-block;
+    line-height: 0px;
+    padding: 11px 3px;
+}
+
+.box h1{
+    border-bottom: 1px dashed #7F7F7F;
+    margin:-20px -20px 0px -20px;
+    padding:10px;
+    background-color:#FFEFEF;
+    color:#EF7777;
+}
+
+.serif {
+	font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+}
+
+.monospace {
+	font-family: "Courier New", Courier, monospace;
+}
+
+#scalePitch select {
+	color: black;
+}
+
+#waitingForTransactions {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 2em;
+    transition: opacity 1s;
+    -webkit-user-select: none; /* Chrome/Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+ */
+    -o-user-select: none;
+    user-select: none;
+}
+
+.disabled {
+    color: #666666;
+}
+
+.BlockHeight {
+	font-size: large;
+}
