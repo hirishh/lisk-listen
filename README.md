@@ -16,7 +16,7 @@ The project is built and ready-to-go. If you change any of the javascript, you w
 
 3. Run `grunt` to build LiskListen. Alternatively, run `grunt watch` and watch for and rebuild changes in the source files.
 
-4. Use another terminal to run `npm start` to start the software. It will be available at http://localhost:3000
+4. Use another terminal to run `npm start` to start the software. It will be available at http://localhost:5425
 
 The compiled/minified script will be output to `lisklisten.min.js`.
 
