@@ -103,20 +103,19 @@ a {
 
 #header {
 	width: 100%;
-	text-align: center;
 	padding: 35px;
 	color: white;
 }
 
 #titleHeader {
-	font-size: 38px;
+	font-size: 35px;
 	line-height: 1;
 	font-weight: 700;
 }
 
 .rate {
-	font-size: 50px;
-  padding: 3px;
+	font-size: 35px;
+  padding: 5px;
 }
 
 #units {
@@ -290,4 +289,16 @@ a.boxclose{
 
 .BlockHeight {
 	font-size: large;
+}
+
+.headerbox, .ratebox {
+	text-align: center;
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (max-width: 1200px) {
+	.headerbox, .ratebox {
+		text-align: left;
+    padding-top: 10px;
+	}
 }

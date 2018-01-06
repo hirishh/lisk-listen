@@ -3,31 +3,34 @@ extends layout
 block content
   #pageSplitter
     #header.row.interface
-      #rateBoxUSDBTC.col-sm-2
-        span#rateUSDBTC.rate ---
-        span#units USD / BTC
-        br
-        span.rateSource BITSTAMP
-      #rateBoxBTCLSK.col-sm-2
-        span#rateBTCLSK.rate ---
-        span#units &micro;BTC / LSK
-        br
-        span.rateSource BITTREX
-      #rateBoxUSDLSK.col-sm-2
-        span#rateUSDLSK.rate ---
-        span#units USD / LSK
-      #headerInfo.col-sm-6
+      #headerInfo.col-sm-12.col-md-12.col-lg-6.headerbox
         span#titleHeader Realtime Lisk Transaction Visualizer
         br
-        strong Donations will be highlighted! 
+        strong Donations will be highlighted! &nbsp;
         span#donationAddress(qrtarget='8522289235233120527L') 8522289235233120527L
         br
-        | By Matteo Ferrari (@hirish on 
-        a(href='https://lisk.chat/') Lisk.Chat 
-        | ) | 
-        a(href='https://github.com/hirishh/lisk-listen') Source Code 
-        | | 
+        | By Matteo Ferrari (@hirish on
+        a(href='https://lisk.chat/') Lisk.Chat &nbsp;
+        | ) | 	&nbsp;
+        a(href='https://github.com/hirishh/lisk-listen') Source Code &nbsp;
+        | | &nbsp;
         a(href='http://www.bitlisten.com/') BitListen
+      #rateBoxUSDBTC.col-sm-12.col-md-12.col-lg-2.ratebox
+        span#rateUSDBTC.rate ---
+        br
+        span#units USD / BTC &nbsp;
+        | &nbsp;
+        span.rateSource BITSTAMP
+      #rateBoxBTCLSK.col-sm-12.col-md-12.col-lg-2.ratebox
+        span#rateBTCLSK.rate ---
+        br
+        span#units &micro;BTC / LSK &nbsp;
+        | &nbsp;
+        span.rateSource BITTREX
+      #rateBoxUSDLSK.col-sm-12.col-md-12.col-lg-2.ratebox
+        span#rateUSDLSK.rate ---
+        br
+        span#units USD / LSK
     #pageDiv.contentPanel
       #bubbleDiv
       #overlay
@@ -35,13 +38,13 @@ block content
           #connectionInnerDiv.interface
             p
               label
-                span#LiskNode Lisk Node: 
-                  span#LiskNodeStatus 
+                span#LiskNode Lisk Node:
+                  span#LiskNodeStatus
                   br
-                span#BittrexNode Bittrex: 
+                span#BittrexNode Bittrex:
                   span#BittrexNodeStatus
                   br
-                span#BitstampNode Bitstamp: 
+                span#BitstampNode Bitstamp:
                   span#BitstampNodeStatus
                   br
         #volumeWrapper.interface
@@ -64,8 +67,12 @@ block content
                 | (bigger transaction = deeper sound)
             p
               label
-                input#enableUSDPrice(type='checkbox', onchange='enableUSDPrice = this.checked')
+                input#enableUSDPriceCheckBox(type='checkbox', onchange='enableUSDPrice = this.checked')
                 | 										Enable USD Price in Transactions
+            p
+              label
+                input#enableBlocksCheckBox(type='checkbox', checked='checked', onchange='enableBlocks = this.checked')
+                | 										Enable Blocks
       span#waitingForTransactions
         | Waiting for new blocks...
   #hideInterface(onclick='toggleInterface()') [ Hide Interface ]

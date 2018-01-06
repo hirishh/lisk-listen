@@ -1,8 +1,13 @@
+var enableBlocks = true;
+
 /**
  *  @constructor
  *  @extends Floatable
  */
 function Block(height, numTransactions, totalAmount, totalFees, blockID) {
+	
+	if(!enableBlocks) return;
+
 	if (document.visibilityState === "visible") {
 		Floatable.call(this);
 
