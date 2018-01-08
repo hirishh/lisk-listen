@@ -2,8 +2,7 @@ var globalRateUSDBTC = -1; // set upon first rate received
 var globalRateBTCLSK = -1; // set upon first rate received
 var pusherBitstamp;
 var channeBitstamp;
-var pusherNode; //Used for bittrex ticker AND lisk node information
-var channelNode;
+var socket = io(); //Connect to server socket
 
 function setGlobalRateUSDBTC(rate) {
     $("#rateUSDBTC").html(parseFloat(rate).toFixed(2));
@@ -46,19 +45,10 @@ $(document).ready(function() {
   // Bittrex BTC - Lisk
   StatusBox.changeStatus(CONNECTING, "lisk");
   StatusBox.changeStatus(CONNECTING, "bittrex");
-  pusherNode = new Pusher('9d89ba5d9683e3b0f329', {
-    cluster: 'eu',
-    encrypted: true
-  });
 
-  channelNode = pusherNode.subscribe('lisk-pusher');
-  channelNode.bind('Bittrex-BTC-LSK-Ticker', function(data) {
-    if(channelNode.subscribed)
+  socket.on('Bittrex-BTC-LSK-Ticker', function(data) {
       StatusBox.changeStatus(CONNECTED, "bittrex");
-    else
-      StatusBox.changeStatus(CLOSED, "bittrex");
-
-    setGlobalRateBTCLSK(data.message.Last);
+      setGlobalRateBTCLSK(data.Last);
   });
 
   if(!DEBUG_MODE)

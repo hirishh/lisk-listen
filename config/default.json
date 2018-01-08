@@ -1,0 +1,11 @@
+{
+  "bittrex-ticker": {
+    "enable": false,
+    "every": 15,
+    "url": "https://bittrex.com/api/v1.1/public/getticker?market=BTC-LSK"
+  },
+  "lisk":  {
+    "every": 5,
+    "url": "<lisk-node-address>/api/"
+  }
+}

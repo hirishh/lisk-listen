@@ -44,15 +44,9 @@ TransactionSocket.processBlock = function(block) {
 
 TransactionSocket.init = function() {
 
-	//channelNode is created in ratebox.js
-	channelNode.bind('Lisk-NewBlock', function(data) {
-    if(channelNode.subscribed)
+	//socket is created in ratebox.js
+	socket.on('Lisk-NewBlock', function(data) {
       StatusBox.changeStatus(CONNECTED, "lisk");
-    else
-      StatusBox.changeStatus(CLOSED, "lisk");
-
-			//TODO Process block here
-			TransactionSocket.processBlock(data.message);
-
+			TransactionSocket.processBlock(data);
   });
 };
