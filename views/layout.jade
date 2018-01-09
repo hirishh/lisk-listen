@@ -1,6 +1,14 @@
 doctype html
 html
   head
+    // Global site tag (gtag.js) - Google Analytics
+    script(async='', src='https://www.googletagmanager.com/gtag/js?id=UA-112247425-1')
+    script.
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-112247425-1');
+
     title LiskListen - Lisk Transaction Visualizer
     meta(name='description', content='Realtime Lisk transaction visualizer. See and hear new transactions and blocks as they occur.')
     meta(name='keywords', content='LiskListen, Listen To Lisk, Lisk, visualizer, blockchain')
@@ -20,5 +28,6 @@ html
 
     script(src='https://js.pusher.com/4.1/pusher.min.js')
     script(src='/javascript/lisklisten.min.js', type='text/javascript')
+
   body
     block content
