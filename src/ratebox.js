@@ -2,7 +2,7 @@ var globalRateUSDBTC = -1; // set upon first rate received
 var globalRateBTCLSK = -1; // set upon first rate received
 var pusherBitstamp;
 var channeBitstamp;
-var socket = io(); //Connect to server socket
+
 
 function setGlobalRateUSDBTC(rate) {
     $("#rateUSDBTC").html(parseFloat(rate).toFixed(2));

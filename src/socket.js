@@ -1,7 +1,20 @@
+var socket = io(); //Connect to server socket
 var satoshi = 100000000;
 var DELAY_CAP = 20000;
 var lastBlockHeight = 0;
 var transactionSocketDelay = 1000;
+
+// sockets.on('connection', function(socket) {
+//    allClients.push(socket);
+//  });
+
+socket.on('connect_error', function() {
+	console.log('Got disconnect!');
+	StatusBox.changeStatus(CLOSED, "lisk");
+	StatusBox.changeStatus(CLOSED, "bittrex");
+});
+
+
 
 /** @constructor */
 function TransactionSocket() {}

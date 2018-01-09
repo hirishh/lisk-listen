@@ -1,7 +1,7 @@
 [
   {
     "name"              : "lisk-listen",
-    "script"            : "./bin/www",
+    "script"            : "app.js",
     "log_date_format"   : "YYYY-MM-DD HH:mm Z",
     "merge_logs"        : false,
     "watch"             : false,
@@ -9,7 +9,9 @@
     "exec_interpreter"  : "node",
     "exec_mode"         : "fork_mode",
     "env"               : {
-                            "PORT": 5425
+                            "PORT": 5425,
+                            "NODE_ENV": "dev",
+                            "DEBUG": "lisk-listen:*"
                           }
   }
 ]
