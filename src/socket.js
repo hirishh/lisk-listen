@@ -57,7 +57,6 @@ TransactionSocket.init = function() {
 
 	//socket is created in ratebox.js
 	socket.on('Lisk-NewBlock', function(data) {
-			console.log(data);
       StatusBox.changeStatus(CONNECTED, "lisk");
 			TransactionSocket.processBlock(data);
   });

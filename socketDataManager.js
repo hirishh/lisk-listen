@@ -1,4 +1,4 @@
-var request = require("request")
+var request = require('request');
 var Repeat = require('repeat');
 var debug = require('debug')('lisk-listen:socket');
 var config = require('config');
@@ -55,7 +55,13 @@ var bootstrapLastBlock = function() {
        if (response.success) {
            debug("Last Block Height is: " + response.height)
            blockIndex = response.height;
-           processBlock(blockIndex);
+
+           var everyForLisk = config.get("lisk.every");
+
+           new Repeat(function() {
+             processBlock(blockIndex);
+           }).every(everyForLisk, 's').start.now();
+
        }
        else {
          debug("Lisk getHeight Error.");
@@ -85,13 +91,10 @@ function processBlock(height)
     .then(
       function (responseBlocks) {
          if (!responseBlocks.success)
-         {
            debug('Error during getBlocks.');
-           updateSetInterval();
-         } else if(responseBlocks.success && responseBlocks.count <= 0) {
+        else if(responseBlocks.success && responseBlocks.count <= 0)
            debug('[ ' + height + ' ] not mined yet.');
-           updateSetInterval();
-         } else {
+        else {
 
            debug('[ ' + height + ' ] get Mined!' );
            blockInfo = responseBlocks.blocks[0];
@@ -101,28 +104,19 @@ function processBlock(height)
            .then(
              function(responseDelegate) {
                if(!responseDelegate.success)
-               {
-                debug('Error during delegate Retrieve.');
-                updateSetInterval();
-               } else {
-
+                 debug('Error during delegate Retrieve.');
+               else {
                  blockInfo.delegate = responseDelegate.delegate;
-
                  processTransactions(blockInfo, height);
-
                }
              }
             ).catch(error => {
-              // Will not execute
               debug('ERROR: DposAPI getByPublicKey Exception caught', error.message);
-              updateSetInterval();
             });
          }
        }
   ).catch(error => {
-    // Will not execute
     debug('ERROR: DposAPI getBlocks Exception caught', error.message);
-    updateSetInterval();
   });
 }
 
@@ -146,25 +140,15 @@ function processTransactions(blockInfo, height) {
          }
        }
     ).catch(error => {
-       // Will not execute
        debug('ERROR: DposAPI getList Exception caught', error.message);
-       updateSetInterval();
     });
 
   }
 }
 
 function finalizeBlockProcess(blockMessage) {
-  //debug(blockMessage);
   broadcast("Lisk-NewBlock", blockMessage);
   blockIndex = blockIndex + 1;
-  updateSetInterval();
-}
-
-var updateSetInterval = function() {
-  intervalObj = setInterval(function() {
-    processBlock(blockIndex);
-  }, 5000);
 }
 
 // Send a message to all clients
