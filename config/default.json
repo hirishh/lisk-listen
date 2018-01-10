@@ -6,6 +6,6 @@
   },
   "lisk":  {
     "every": 5,
-    "url": "<lisk-node-address>/api/"
+    "url": "<lisk-node-address>"
   }
 }

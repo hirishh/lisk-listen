@@ -13,10 +13,6 @@ var clients = [];
 
 var urlBittrekTicker = config.get("bittrex-ticker.url");
 
-function triggerNewPriceTicker(message) {
-  broadcast("Bittrex-BTC-LSK-Ticker", message);
-}
-
 var bittrexTicker = function() {
   request( { url: urlBittrekTicker, json: true},
            function (errorTicker, responseTicker, bodyTicker) {
@@ -24,7 +20,7 @@ var bittrexTicker = function() {
                   if("result" in bodyTicker)
                   {
                     debug('New Ticker BTC-LSK: ' + bodyTicker.result.Last);
-                    triggerNewPriceTicker(bodyTicker.result);
+                    broadcast("Bittrex-BTC-LSK-Ticker", bodyTicker.result);
                   }
               }
         });
@@ -42,98 +38,140 @@ else
 *  Lisk.io Block and Transactions Pusher
 ** *************************** */
 
-function triggerNewLiskBlock(message) {
-  broadcast("Lisk-NewBlock", message);
-}
+var dposAPI = require('dpos-api-wrapper').dposAPI;
+dposAPI.nodeAddress= config.get("lisk.url");
 
 var blockIndex = -1;
-var blockIndexProcessed = -1;
 
-var urlLiskIo = config.get("lisk.url");
+var bootstrapLastBlock = function() {
 
-var liskBlockParser = function() {
-
-  if(blockIndex == -1) {
     debug('Start Lisk Block Parser');
     //First Run
     debug('First run... retrieving Block Height');
-    request( { url: urlLiskIo + "blocks/getHeight", json: true},
-             function (errorHeight, responseHeight, bodyHeight) {
-                if (!errorHeight && responseHeight.statusCode === 200 && bodyHeight.success) {
-                    debug(bodyHeight);
-                    debug("Last Block Height is: " + bodyHeight.height)
-                    blockIndex = bodyHeight.height;
-                    processBlock(blockIndex);
-                }
-                else
-                  debug("Lisk getHeight Error: " + errorHeight);
-          });
-  }
-  else
-    processBlock(blockIndex);
+
+    dposAPI.blocks.getHeight()
+    .then(
+      function (response) {
+       if (response.success) {
+           debug("Last Block Height is: " + response.height)
+           blockIndex = response.height;
+           processBlock(blockIndex);
+       }
+       else {
+         debug("Lisk getHeight Error.");
+       }
+
+   }).catch(error => {
+     // Will not execute
+     debug('ERROR: DposAPI getHeight Exception caught', error.message);
+   });
+
 }
 
 var intervalObj;
-liskBlockParser();
+bootstrapLastBlock();
 
 function processBlock(height)
 {
+  if(blockIndex == -1)
+    return;
+
   clearInterval(intervalObj);
+
   debug('[ ' + height + ' ] Processing Block');
   var blockInfo;
 
-  request( { url: urlLiskIo + "blocks?height=" + height , json: true},
-           function (errorBlock, responseBlock, bodyBlock) {
-              if (!errorBlock && responseBlock.statusCode === 200 &&
-                  bodyBlock.success && bodyBlock.blocks.length > 0) {
+  dposAPI.blocks.getBlocks({"height": height})
+    .then(
+      function (responseBlocks) {
+         if (!responseBlocks.success)
+         {
+           debug('Error during getBlocks.');
+           updateSetInterval();
+         } else if(responseBlocks.success && responseBlocks.count <= 0) {
+           debug('[ ' + height + ' ] not mined yet.');
+           updateSetInterval();
+         } else {
 
-                  blockInfo = bodyBlock.blocks[0];
+           debug('[ ' + height + ' ] get Mined!' );
+           blockInfo = responseBlocks.blocks[0];
 
-                  debug('[ ' + height + ' ] get Mined!' )
+           //Retrieve Delegate name
+           dposAPI.delegates.getByPublicKey(blockInfo.generatorPublicKey)
+           .then(
+             function(responseDelegate) {
+               if(!responseDelegate.success)
+               {
+                debug('Error during delegate Retrieve.');
+                updateSetInterval();
+               } else {
 
-                  if(blockInfo.numberOfTransactions > 0) {
-                    debug('[ ' + height + ' ] Retrieveing transactions!' )
-                    //Retrieve transactions
-                    request( { url: urlLiskIo + "transactions?blockId=" + blockInfo.id, json: true},
-                             function (errorTx, responseTx, bodyTx) {
-                                if (!errorTx && responseTx.statusCode === 200 &&
-                                    bodyTx.success && bodyTx.transactions.length > 0) {
-                                    debug('[ ' + height + ' ] Transactions Retrieved')
+                 blockInfo.delegate = responseDelegate.delegate;
 
-                                    blockInfo.transactions = bodyTx.transactions;
-                                    finalizeBlockProcess(blockInfo);
-                                }
-                          });
-                  } else {
-                      debug('[ ' + height + ' ] No transaction to retrieve!' );
-                      finalizeBlockProcess(blockInfo);
-                  }
-              }
-              else {
-                debug('[ ' + height + ' ] not mined yet.');
-                intervalObj = setInterval(liskBlockParser, 5000);
-              }
-        });
+                 processTransactions(blockInfo, height);
+
+               }
+             }
+            ).catch(error => {
+              // Will not execute
+              debug('ERROR: DposAPI getByPublicKey Exception caught', error.message);
+              updateSetInterval();
+            });
+         }
+       }
+  ).catch(error => {
+    // Will not execute
+    debug('ERROR: DposAPI getBlocks Exception caught', error.message);
+    updateSetInterval();
+  });
+}
+
+function processTransactions(blockInfo, height) {
+  if(blockInfo.numberOfTransactions <= 0)
+  {
+      debug('[ ' + height + ' ] No transaction to retrieve!' );
+      finalizeBlockProcess(blockInfo);
+  } else {
+
+    debug('[ ' + height + ' ] Retrieveing transactions!' );
+
+    dposAPI.transactions.getList({"blockId": blockInfo.id})
+    .then(
+      function (responseTransactions) {
+         if (responseTransactions.success && responseTransactions.count > 0) {
+             debug('[ ' + height + ' ] ' + responseTransactions.count + ' Transactions Retrieved');
+
+             blockInfo.transactions = responseTransactions.transactions;
+             finalizeBlockProcess(blockInfo);
+         }
+       }
+    ).catch(error => {
+       // Will not execute
+       debug('ERROR: DposAPI getList Exception caught', error.message);
+       updateSetInterval();
+    });
+
+  }
 }
 
 function finalizeBlockProcess(blockMessage) {
   //debug(blockMessage);
-  triggerNewLiskBlock(blockMessage);
+  broadcast("Lisk-NewBlock", blockMessage);
   blockIndex = blockIndex + 1;
-  intervalObj = setInterval(liskBlockParser, 5000);
+  updateSetInterval();
 }
 
-
+var updateSetInterval = function() {
+  intervalObj = setInterval(function() {
+    processBlock(blockIndex);
+  }, 5000);
+}
 
 // Send a message to all clients
 function broadcast(topic, message) {
   clients.forEach(function (socket) {
     socket.emit(topic, message);
   });
-}
-
-exports.currentBlockHeight = function() {
-  return blockIndex;
 }
 
 exports.addClient = function(socket) {
