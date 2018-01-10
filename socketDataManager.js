@@ -23,6 +23,10 @@ exports.removeClient = function(socket) {
   clients.splice(clients.indexOf(socket), 1);
 }
 
+exports.getClientsCount = function() {
+  return clients.length;
+}
+
 
 /* ***************************
 *  Bittrex Ticker BTC - LSK

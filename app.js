@@ -68,13 +68,13 @@ server.on('listening', onListening);
 
 io.on('connection', function (socket) {
   dataManager.addClient(socket);
-  debug("New User Connection! ID: " + socket.id );
+  debug("[ " + dataManager.getClientsCount() + " ] New User Connection! ID: " + socket.id );
 
   socket.emit("Lisk-Donations", dataManager.getDonations());
 
   socket.on('disconnect', function() {
-      debug("User disconnect! ID: " + socket.id);
       dataManager.removeClient(socket);
+      debug("[ " + dataManager.getClientsCount() + " ] User disconnect! ID: " + socket.id);
    });
 });
 
