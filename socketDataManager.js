@@ -55,9 +55,7 @@ var bootstrapLastBlock = function() {
        if (response.success) {
            debug("Last Block Height is: " + response.height)
            blockIndex = response.height;
-
            var everyForLisk = config.get("lisk.every");
-
            new Repeat(function() {
              processBlock(blockIndex);
            }).every(everyForLisk, 's').start.now();
@@ -74,15 +72,12 @@ var bootstrapLastBlock = function() {
 
 }
 
-var intervalObj;
 bootstrapLastBlock();
 
 function processBlock(height)
 {
   if(blockIndex == -1)
     return;
-
-  clearInterval(intervalObj);
 
   debug('[ ' + height + ' ] Processing Block');
   var blockInfo;
@@ -128,13 +123,11 @@ function processTransactions(blockInfo, height) {
   } else {
 
     debug('[ ' + height + ' ] Retrieveing transactions!' );
-
     dposAPI.transactions.getList({"blockId": blockInfo.id})
     .then(
       function (responseTransactions) {
          if (responseTransactions.success && responseTransactions.count > 0) {
              debug('[ ' + height + ' ] ' + responseTransactions.count + ' Transactions Retrieved');
-
              blockInfo.transactions = responseTransactions.transactions;
              finalizeBlockProcess(blockInfo);
          }
