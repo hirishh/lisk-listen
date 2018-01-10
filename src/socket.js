@@ -36,7 +36,7 @@ TransactionSocket.processBlock = function(block) {
 	if (block.height > lastBlockHeight) {
 		lastBlockHeight = block.height;
 		console.log("New Block: " + block.height + " with " + block.numberOfTransactions + " transactions");
-		new Block(block.height, block.numberOfTransactions, block.totalAmount, block.totalFee, block.id);
+		new Block(block);
 	}
 	else {
 		return;
@@ -51,14 +51,13 @@ TransactionSocket.processBlock = function(block) {
 		createTxAnimation(block.transactions[j].amount, isDonation, block.transactions[j].type);
 	}
 
-
-
 };
 
 TransactionSocket.init = function() {
 
 	//socket is created in ratebox.js
 	socket.on('Lisk-NewBlock', function(data) {
+			console.log(data);
       StatusBox.changeStatus(CONNECTED, "lisk");
 			TransactionSocket.processBlock(data);
   });

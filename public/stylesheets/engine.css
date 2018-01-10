@@ -291,6 +291,10 @@ a.boxclose{
 	font-size: large;
 }
 
+.BlockBody {
+	font-size: small;
+}
+
 .headerbox, .ratebox {
 	text-align: center;
 }

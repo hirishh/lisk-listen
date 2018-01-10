@@ -26,17 +26,17 @@ function Transaction(lisks, highlight, type) {
 		else
 			liskBTC = lisksV * 0.00100000; //100k di default
 
-		this.area = 10000; //Default for not SEND transactions.
+		this.area = 7000; //Default for not SEND transactions.
 
 		switch (type) {
 			case TX_SIGNATURE:
-				body = "NEW <br /> SIGNATURE";
+				body = "New <br /> Signature";
 				break;
 			case TX_DELEGATE:
-				body = "NEW <br /> DELEGATE";
+				body = "New <br /> Delegate";
 				break;
 			case TX_VOTE:
-				body = "VOTE";
+				body = "Vote";
 				break;
 			default:
 				body = getSendBody(lisksV, highlight);
@@ -45,7 +45,7 @@ function Transaction(lisks, highlight, type) {
 
 		this.width = this.height = Math.sqrt(this.area / Math.PI) * 2;
 		this.addImage(bubbleImage, this.width, this.height);
-		this.addText(body);
+		this.addText('<span class="BlockBody">' + body + '</span>');
 		this.initPosition();
 
 		// Sound
