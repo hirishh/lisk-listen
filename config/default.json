@@ -6,6 +6,7 @@
   },
   "lisk":  {
     "every": 5,
-    "url": "<lisk-node-address>"
+    "url": "<lisk-node-address>",
+    "donationAddress": "<lisk-address>"
   }
 }

@@ -2,9 +2,26 @@ var request = require('request');
 var Repeat = require('repeat');
 var debug = require('debug')('lisk-listen:socket');
 var config = require('config');
+var dposAPI = require('dpos-api-wrapper').dposAPI;
+dposAPI.nodeAddress= config.get("lisk.url");
 
 // Keep track of the chat clients
 var clients = [];
+
+// Send a message to all clients
+var broadcast = function(topic, message) {
+  clients.forEach(function (socket) {
+    socket.emit(topic, message);
+  });
+}
+
+exports.addClient = function(socket) {
+  clients.push(socket);
+}
+
+exports.removeClient = function(socket) {
+  clients.splice(clients.indexOf(socket), 1);
+}
 
 
 /* ***************************
@@ -34,13 +51,79 @@ if(config.get("bittrex-ticker.enable")){
 else
   debug('Bittrex Ticker Disabled.');
 
+
+/* ***************************
+*  Lisk.io Donations
+** *************************** */
+var donations = [];
+var donationAddress= config.get("lisk.donationAddress");
+
+var processDonation = function(tx, isBcast) {
+  if(tx.senderId == donationAddress || tx.senderId == "17670127987160191762L") return;
+  //Retrieve Delegate name
+  dposAPI.delegates.getByPublicKey(tx.senderPublicKey)
+  .then(
+    function(responseDelegate) {
+      if(!responseDelegate.success)
+        debug('Error during delegate Retrieve.');
+      else {
+        tx.delegate = responseDelegate.delegate.username;
+        debug('Pushing Donation from ' + tx.senderId);
+        addDonations(tx, isBcast);
+      }
+    }
+   ).catch(error => {
+     if(error.message == "Delegate not found")
+     {
+       debug('Pushing ANON Donation from ' + tx.senderId);
+       addDonations(tx, isBcast);
+     }
+     else
+       debug('ERROR: DposAPI getByPublicKey Exception caught', error.message);
+   });
+}
+
+function compareDonations(a, b) {
+  if (a.amount < b.amount)
+    return 1;
+  if (a.amount > b.amount)
+    return -1;
+  return 0;
+}
+
+var addDonations = function(tx, isBcast) {
+  donations.push(tx);
+  donations.sort(compareDonations);
+  if(isBcast)
+    broadcast("Lisk-Donations", donations);
+}
+
+var retrieveDonations = function() {
+  debug('Retrieving Donations');
+  dposAPI.transactions.getList({recipientId: donationAddress})
+  .then(
+    function (response) {
+     if (!response.success)
+       debug("Lisk getDonations Error.");
+     else {
+         debug("Retrieved " + response.count + " Donations!")
+         response.transactions.forEach(processDonation);
+     }
+  }).catch(error => {
+    debug('ERROR: DposAPI Donation Exception caught', error.message);
+  });
+
+}
+
+exports.getDonations = function() {
+  return donations;
+}
+
+retrieveDonations();
+
 /* ***************************
 *  Lisk.io Block and Transactions Pusher
 ** *************************** */
-
-var dposAPI = require('dpos-api-wrapper').dposAPI;
-dposAPI.nodeAddress= config.get("lisk.url");
-
 var blockIndex = -1;
 
 var bootstrapLastBlock = function() {
@@ -66,7 +149,6 @@ var bootstrapLastBlock = function() {
        }
 
    }).catch(error => {
-     // Will not execute
      debug('ERROR: DposAPI getHeight Exception caught', error.message);
    });
 
@@ -130,6 +212,13 @@ function processTransactions(blockInfo, height) {
              debug('[ ' + height + ' ] ' + responseTransactions.count + ' Transactions Retrieved');
              blockInfo.transactions = responseTransactions.transactions;
              finalizeBlockProcess(blockInfo);
+
+             //Check for Donations
+             responseTransactions.transactions.forEach(
+               function(tx) {
+                 if(tx.recipientId == donationAddress)
+                   processDonation(tx, /*broadcast*/ true);
+             });
          }
        }
     ).catch(error => {
@@ -142,19 +231,4 @@ function processTransactions(blockInfo, height) {
 function finalizeBlockProcess(blockMessage) {
   broadcast("Lisk-NewBlock", blockMessage);
   blockIndex = blockIndex + 1;
-}
-
-// Send a message to all clients
-function broadcast(topic, message) {
-  clients.forEach(function (socket) {
-    socket.emit(topic, message);
-  });
-}
-
-exports.addClient = function(socket) {
-  clients.push(socket);
-}
-
-exports.removeClient = function(socket) {
-  clients.splice(clients.indexOf(socket), 1);
 }

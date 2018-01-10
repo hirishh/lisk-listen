@@ -70,6 +70,8 @@ io.on('connection', function (socket) {
   dataManager.addClient(socket);
   debug("New User Connection! ID: " + socket.id );
 
+  socket.emit("Lisk-Donations", dataManager.getDonations());
+
   socket.on('disconnect', function() {
       debug("User disconnect! ID: " + socket.id);
       dataManager.removeClient(socket);

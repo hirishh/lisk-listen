@@ -127,6 +127,20 @@ a {
 	font-size: larger;
 }
 
+#donations {
+	color: white;
+	padding: 15px;
+}
+
+#titleDonation {
+	font-size: 20px;
+	font-weight: 700;
+}
+
+#donationsContent strong {
+	padding: 8px 2px;
+}
+
 #volumeWrapper {
 	position: absolute;
 	bottom: 150px;
