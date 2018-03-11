@@ -5,6 +5,9 @@ var config = require('config');
 var dposAPI = require('dpos-api-wrapper').dposAPI;
 dposAPI.nodeAddress= config.get("lisk.url");
 
+var liskGroups = require("./dpos-tools-data/lisk/groups.json");
+var ligGroup = ["dakk", "liskit", "anamix", "corsaro", "splatters", "redsn0w", "gregorst", "odin", "vekexasia", "hirish", "fulig"];
+
 // Keep track of the chat clients
 var clients = [];
 
@@ -63,7 +66,7 @@ var donations = [];
 var donationAddress= config.get("lisk.donationAddress");
 
 var processDonation = function(tx, isBcast) {
-  if(tx.senderId == donationAddress || tx.senderId == "17670127987160191762L") return;
+  if(tx.senderId == donationAddress) return;
   //Retrieve Delegate name
   dposAPI.delegates.getByPublicKey(tx.senderPublicKey)
   .then(
@@ -75,8 +78,8 @@ var processDonation = function(tx, isBcast) {
         debug('Pushing Donation from ' + tx.senderId);
         addDonations(tx, isBcast);
       }
-    }
-   ).catch(error => {
+  })
+  .catch(error => {
      if(error.message == "Delegate not found")
      {
        debug('Pushing ANON Donation from ' + tx.senderId);
@@ -96,10 +99,63 @@ function compareDonations(a, b) {
 }
 
 var addDonations = function(tx, isBcast) {
-  donations.push(tx);
+
+  var donation = {
+    senderId: tx.senderId,
+    delegate: null,
+    pools: [],
+    amount: tx.amount
+  }
+
+  if(!isEmptyStr(tx.delegate)) {
+
+    if(tx.delegate == "hirish")
+      return; //Remove self transactions
+
+    donation.delegate = tx.delegate;
+
+    tx.pools = [];
+    if(liskGroups.ascend.members.indexOf(donation.delegate) != -1)
+      donation.pools.push("Ascend");
+    if(ligGroup.indexOf(donation.delegate) != -1)
+      donation.pools.push("LIG");
+    if(liskGroups.gdt.members.indexOf(donation.delegate) != -1)
+      donation.pools.push("GDT");
+    if(liskGroups.sherwood.members.indexOf(donation.delegate) != -1)
+      donation.pools.push("Sherwood");
+    if(liskGroups.dutch.members.indexOf(donation.delegate) != -1)
+      donation.pools.push("Dutch");
+    if(liskGroups.elite.members.indexOf(donation.delegate) != -1)
+      donation.pools.push("Elite");
+
+    //Particular cases
+    if(tx.delegate == "arca_music")
+      donation.pools.push("Ascend");
+    if(tx.delegate == "cc001_fund2")
+      donation.pools.push("GDT");
+  }
+
+  var donationIndex = getDonationIndex(donation.senderId);
+
+  if(donationIndex == -1)
+    donations.push(donation);
+  else {
+    donations[donationIndex].delegate = donation.delegate;
+    donations[donationIndex].pools = donation.pools;
+    donations[donationIndex].amount += donation.amount;
+  }
+
   donations.sort(compareDonations);
+
   if(isBcast)
     broadcast("Lisk-Donations", donations);
+}
+
+function getDonationIndex(senderId) {
+  for(var i=0; i < donations.length; i++)
+    if(donations[i].senderId == senderId)
+      return i;
+  return -1;
 }
 
 var retrieveDonations = function() {
@@ -113,7 +169,8 @@ var retrieveDonations = function() {
          debug("Retrieved " + response.count + " Donations!")
          response.transactions.forEach(processDonation);
      }
-  }).catch(error => {
+  })
+  .catch(error => {
     debug('ERROR: DposAPI Donation Exception caught', error.message);
   });
 
@@ -235,4 +292,8 @@ function processTransactions(blockInfo, height) {
 function finalizeBlockProcess(blockMessage) {
   broadcast("Lisk-NewBlock", blockMessage);
   blockIndex = blockIndex + 1;
+}
+
+function isEmptyStr(str) {
+    return (!str || 0 === str.length);
 }
