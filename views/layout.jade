@@ -1,13 +1,7 @@
 doctype html
 html
   head
-    // Global site tag (gtag.js) - Google Analytics
-    script(async='', src='https://www.googletagmanager.com/gtag/js?id=UA-112247425-1')
-    script.
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-112247425-1');
+    include gtag.html
 
     title LiskListen - Lisk Transaction Visualizer
     meta(name='description', content='Realtime Lisk transaction visualizer. See and hear new transactions and blocks as they occur.')
