@@ -6,7 +6,7 @@ var dposAPI = require('dpos-api-wrapper').dposAPI;
 dposAPI.nodeAddress= config.get("lisk.url");
 
 var liskGroups = require("./dpos-tools-data/lisk/groups.json");
-var ligGroup = ["dakk", "liskit", "anamix", "corsaro", "splatters", "redsn0w", "gregorst", "odin", "vekexasia", "hirish", "fulig"];
+var ligGroup = ["dakk", "liskit", "anamix", "corsaro", "splatters", "redsn0w", "gregorst", "ondin", "vekexasia", "hirish", "fulig"];
 
 // Keep track of the chat clients
 var clients = [];
