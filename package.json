@@ -7,27 +7,27 @@
   },
   "dependencies": {
     "body-parser": "~1.18.2",
-    "config": "^1.28.1",
+    "config": "^1.30.0",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
-    "dpos-api-wrapper": "^1.3.0",
+    "dpos-api-wrapper": "^1.3.2",
     "express": "~4.15.5",
     "jade": "~1.11.0",
     "morgan": "~1.9.0",
     "repeat": "0.0.6",
-    "request": "^2.83.0",
+    "request": "^2.85.0",
     "serve-favicon": "~2.4.5",
-    "socket.io": "^2.0.4"
+    "socket.io": "^2.1.0"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
     "grunt-contrib-concat": "~0.5.1",
     "grunt-contrib-jshint": "~0.11.2",
     "grunt-contrib-uglify": "~0.9.1",
-    "grunt-move": "^0.1.3",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-move": "^0.1.5",
     "grunt-newer": "~1.1.0",
-    "grunt-todos": "~0.3.0",
-    "grunt-contrib-watch": "~0.6.1"
+    "grunt-todos": "~0.3.0"
   },
   "repository": {
     "type": "git",
