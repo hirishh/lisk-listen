@@ -2,8 +2,9 @@ var request = require('request');
 var Repeat = require('repeat');
 var debug = require('debug')('lisk-listen:socket');
 var config = require('config');
-var dposAPI = require('dpos-api-wrapper').dposAPI;
-dposAPI.nodeAddress= config.get("lisk.url");
+
+const lisk = require("lisk-elements");
+const client = new lisk.APIClient([config.get("lisk.url")]);
 
 var liskGroups = require("./dpos-tools-data/lisk/groups.json");
 var ligGroup = ["dakk", "liskit", "anamix", "corsaro", "splatters", "redsn0w", "gregorst", "ondin", "vekexasia", "hirish", "fulig"];
@@ -68,25 +69,22 @@ var donationAddress= config.get("lisk.donationAddress");
 var processDonation = function(tx, isBcast) {
   if(tx.senderId == donationAddress) return;
   //Retrieve Delegate name
-  dposAPI.delegates.getByPublicKey(tx.senderPublicKey)
+  client.delegates.get({publicKey: tx.senderPublicKey})
   .then(
     function(responseDelegate) {
-      if(!responseDelegate.success)
+      if(!responseDelegate)
         debug('Error during delegate Retrieve.');
-      else {
-        tx.delegate = responseDelegate.delegate.username;
-        debug('Pushing Donation from ' + tx.senderId);
+      else if (responseDelegate.data.length === 0) {
+        debug('Pushing ANON Donation from ' + tx.senderId);
+        addDonations(tx, isBcast);
+      } else {
+        tx.delegate = responseDelegate.data[0].username;
+        debug('Pushing Donation from ' + tx.senderId + ' Delegate: ' + tx.delegate);
         addDonations(tx, isBcast);
       }
   })
   .catch(error => {
-     if(error.message == "Delegate not found")
-     {
-       debug('Pushing ANON Donation from ' + tx.senderId);
-       addDonations(tx, isBcast);
-     }
-     else
-       debug('ERROR: DposAPI getByPublicKey Exception caught', error.message);
+       debug('ERROR: delegates.get Exception caught ', error.message);
    });
 }
 
@@ -104,40 +102,40 @@ var addDonations = function(tx, isBcast) {
     senderId: tx.senderId,
     delegate: null,
     pools: [],
-    amount: tx.amount
+    amount: parseFloat(tx.amount)
   }
 
   if(!isEmptyStr(tx.delegate)) {
 
-    if(tx.delegate == "hirish")
+    if(tx.delegate === "hirish")
       return; //Remove self transactions
 
     donation.delegate = tx.delegate;
 
     tx.pools = [];
-    if(liskGroups.ascend.members.indexOf(donation.delegate) != -1)
+    if(liskGroups.ascend.members.indexOf(donation.delegate) !== -1)
       donation.pools.push("Ascend");
-    if(ligGroup.indexOf(donation.delegate) != -1)
+    if(ligGroup.indexOf(donation.delegate) !== -1)
       donation.pools.push("LIG");
-    if(liskGroups.gdt.members.indexOf(donation.delegate) != -1)
+    if(liskGroups.gdt.members.indexOf(donation.delegate) !== -1)
       donation.pools.push("GDT");
-    if(liskGroups.sherwood.members.indexOf(donation.delegate) != -1)
+    if(liskGroups.sherwood.members.indexOf(donation.delegate) !== -1)
       donation.pools.push("Sherwood");
-    if(liskGroups.dutch.members.indexOf(donation.delegate) != -1)
+    if(liskGroups.dutch.members.indexOf(donation.delegate) !== -1)
       donation.pools.push("Dutch");
-    if(liskGroups.elite.members.indexOf(donation.delegate) != -1)
+    if(liskGroups.elite.members.indexOf(donation.delegate) !== -1)
       donation.pools.push("Elite");
 
     //Particular cases
-    if(tx.delegate == "arca_music")
+    if(tx.delegate === "arca_music")
       donation.pools.push("Ascend");
-    if(tx.delegate == "cc001_fund2")
+    if(tx.delegate === "cc001_fund2")
       donation.pools.push("GDT");
   }
 
   var donationIndex = getDonationIndex(donation.senderId);
 
-  if(donationIndex == -1)
+  if(donationIndex === -1)
     donations.push(donation);
   else {
     donations[donationIndex].delegate = donation.delegate;
@@ -153,25 +151,25 @@ var addDonations = function(tx, isBcast) {
 
 function getDonationIndex(senderId) {
   for(var i=0; i < donations.length; i++)
-    if(donations[i].senderId == senderId)
+    if(donations[i].senderId === senderId)
       return i;
   return -1;
 }
 
 var retrieveDonations = function() {
-  debug('Retrieving Donations');
-  dposAPI.transactions.getList({recipientId: donationAddress})
+  debug('Retrieving Donations for address: ' + donationAddress);
+  client.transactions.get({recipientId: donationAddress, limit: 100})
   .then(
     function (response) {
-     if (!response.success)
+     if (!response)
        debug("Lisk getDonations Error.");
      else {
          debug("Retrieved " + response.count + " Donations!")
-         response.transactions.forEach(processDonation);
+         response.data.forEach(processDonation);
      }
   })
   .catch(error => {
-    debug('ERROR: DposAPI Donation Exception caught', error.message);
+    debug('ERROR: transactions.get Exception caught ', error.message);
   });
 
 }
@@ -193,12 +191,12 @@ var bootstrapLastBlock = function() {
     //First Run
     debug('First run... retrieving Block Height');
 
-    dposAPI.blocks.getHeight()
+    client.blocks.get({limit: 1})
     .then(
       function (response) {
-       if (response.success) {
-           debug("Last Block Height is: " + response.height)
-           blockIndex = response.height;
+       if (response && response.data.length !== 0) {
+           blockIndex = response.data[0].height;
+           debug("Last Block Height is: " + blockIndex);
            var everyForLisk = config.get("lisk.every");
            new Repeat(function() {
              processBlock(blockIndex);
@@ -210,7 +208,7 @@ var bootstrapLastBlock = function() {
        }
 
    }).catch(error => {
-     debug('ERROR: DposAPI getHeight Exception caught', error.message);
+     debug('ERROR: blocks.get Exception caught', error.message);
    });
 
 }
@@ -225,36 +223,36 @@ function processBlock(height)
   debug('[ ' + height + ' ] Processing Block');
   var blockInfo;
 
-  dposAPI.blocks.getBlocks({"height": height})
+  client.blocks.get({"height": height})
     .then(
       function (responseBlocks) {
-         if (!responseBlocks.success)
+         if (!responseBlocks)
            debug('Error during getBlocks.');
-        else if(responseBlocks.success && responseBlocks.count <= 0)
+        else if(responseBlocks.data.length === 0)
            debug('[ ' + height + ' ] not mined yet.');
         else {
 
            debug('[ ' + height + ' ] get Mined!' );
-           blockInfo = responseBlocks.blocks[0];
+           blockInfo = responseBlocks.data[0];
 
            //Retrieve Delegate name
-           dposAPI.delegates.getByPublicKey(blockInfo.generatorPublicKey)
+           client.delegates.get( {publicKey: blockInfo.generatorPublicKey} )
            .then(
              function(responseDelegate) {
-               if(!responseDelegate.success)
+               if(!responseDelegate || responseDelegate.data.length === 0)
                  debug('Error during delegate Retrieve.');
                else {
-                 blockInfo.delegate = responseDelegate.delegate;
+                 blockInfo.delegate = responseDelegate.data[0];
                  processTransactions(blockInfo, height);
                }
              }
             ).catch(error => {
-              debug('ERROR: DposAPI getByPublicKey Exception caught', error.message);
+              debug('ERROR: delegates.get Exception caught', error.message);
             });
          }
        }
   ).catch(error => {
-    debug('ERROR: DposAPI getBlocks Exception caught', error.message);
+    debug('ERROR: blocks.get Exception caught', error.message);
   });
 }
 
@@ -266,16 +264,16 @@ function processTransactions(blockInfo, height) {
   } else {
 
     debug('[ ' + height + ' ] Retrieveing transactions!' );
-    dposAPI.transactions.getList({"blockId": blockInfo.id})
+    client.transactions.get({"blockId": blockInfo.id, limit: 50})
     .then(
       function (responseTransactions) {
-         if (responseTransactions.success && responseTransactions.count > 0) {
-             debug('[ ' + height + ' ] ' + responseTransactions.count + ' Transactions Retrieved');
-             blockInfo.transactions = responseTransactions.transactions;
+         if (responseTransactions && responseTransactions.data.length > 0) {
+             debug('[ ' + height + ' ] ' + responseTransactions.data.length + ' Transactions Retrieved');
+             blockInfo.transactions = responseTransactions.data;
              finalizeBlockProcess(blockInfo);
 
              //Check for Donations
-             responseTransactions.transactions.forEach(
+             responseTransactions.data.forEach(
                function(tx) {
                  if(tx.recipientId == donationAddress)
                    processDonation(tx, /*broadcast*/ true);
@@ -283,7 +281,7 @@ function processTransactions(blockInfo, height) {
          }
        }
     ).catch(error => {
-       debug('ERROR: DposAPI getList Exception caught', error.message);
+       debug('ERROR: transactions.get Exception caught ', error.message);
     });
 
   }

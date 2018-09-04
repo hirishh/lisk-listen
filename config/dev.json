@@ -6,7 +6,7 @@
   },
   "lisk":  {
     "every": 5,
-    "url": "https://node05.lisk.io",
+    "url": "https://node05.lisk.io:443",
     "donationAddress": "8522289235233120527L"
   }
 }
