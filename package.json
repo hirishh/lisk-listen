@@ -17,7 +17,7 @@
     "repeat": "0.0.6",
     "request": "^2.85.0",
     "serve-favicon": "~2.4.5",
-    "socket.io": "^2.1.0"
+    "socket.io": "^2.4.0"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
